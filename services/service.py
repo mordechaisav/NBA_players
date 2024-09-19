@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify
 from flask import current_app as app
 from models.players import db, Player
-
 from models.player_stats import PlayerStats
 import requests
 def get_data_for_season(season):
@@ -64,3 +63,43 @@ def calculate_PPG_ratio():
             print(f'PPG ratio for {player.name} is {player.PPG_ratio}')
         return ppg_ratio
 
+def calculate_stats_list_of_players(players):
+    players_and_stats = []
+    for player_id, player_list in players.items():
+
+        total_points = 0
+        total_two_percent = 0
+        total_three_percent = 0
+        total_ATR = 0
+        seasons = set()
+        team = "Unknown"
+
+        for player in player_list:
+            total_points += player.points if player.points is not None else 0
+            total_two_percent += player.two_percent if player.two_percent is not None else 0
+            total_three_percent += player.three_percent if player.three_percent is not None else 0
+            total_ATR += player.ATR if player.ATR is not None else 0
+            seasons.add(player.season)
+            team = player.team
+
+        num_entries = len(player_list)
+        avg_points = total_points / num_entries
+        avg_two_percent = total_two_percent / num_entries
+        avg_three_percent = total_three_percent / num_entries
+        avg_ATR = total_ATR / num_entries
+
+        player_to_print = {
+            "player_id": player_id,
+            "name": player_list[0].name,
+            "team": team,
+            "position": player_list[0].position,
+            "points": avg_points,
+            "two_percent": avg_two_percent,
+            "three_percent": avg_three_percent,
+            "ATR": avg_ATR,
+            "seasons": list(seasons),
+            "PPG_ratio": player_list[0].PPG_ratio
+        }
+
+        players_and_stats.append(player_to_print)
+    return players_and_stats

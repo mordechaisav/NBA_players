@@ -69,7 +69,7 @@ def get_players_by_position(position,season=None):
 def create_team():
     data = request.get_json()
 
-    # קבלת פרטי הקבוצה מהבקשה
+
     name = data.get('name')
     pg_id = data.get('PG')
     sg_id = data.get('SG')
@@ -77,17 +77,16 @@ def create_team():
     pf_id = data.get('PF')
     c_id = data.get('C')
 
-    # בדוק אם כל השדות נמסרו
     if not all([name, pg_id, sg_id, sf_id, pf_id, c_id]):
         return jsonify({"error": "All fields are required."}), 400
 
-    # בדוק אם השחקנים קיימים
+
     player_ids = [pg_id, sg_id, sf_id, pf_id, c_id]
     for player_id in player_ids:
         if not Player.query.filter_by(player_id=player_id).first():
             return jsonify({"error": "One or more player IDs are invalid."}), 400
 
-    # יצירת אובייקט קבוצה חדש
+
     new_team = Team(
         name=name,
         PG=pg_id,
@@ -105,5 +104,5 @@ def create_team():
         db.session.rollback()
         return jsonify({"error": "An error occurred while creating the team: " + str(e)}), 500
 
-#get the player stats by player_id
+
 
